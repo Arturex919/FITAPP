@@ -315,7 +315,7 @@ async def get_exercises(
     if musculo:
         query["musculo_principal"] = {"$regex": musculo, "$options": "i"}
     
-    exercises = await db.exercises.find(query).to_list(100)
+    exercises = await db.exercises.find(query, {"_id": 0}).to_list(100)
     return [Exercise(**ex) for ex in exercises]
 
 @api_router.get("/exercises/{exercise_id}", response_model=Exercise)
@@ -327,7 +327,7 @@ async def get_exercise(exercise_id: str):
 
 @api_router.get("/exercises/category/{categoria}", response_model=List[Exercise])
 async def get_exercises_by_category(categoria: str):
-    exercises = await db.exercises.find({"categoria": categoria}).to_list(50)
+    exercises = await db.exercises.find({"categoria": categoria}, {"_id": 0}).to_list(50)
     return [Exercise(**ex) for ex in exercises]
 
 # ==================== ROUTINES ENDPOINTS ====================
@@ -343,7 +343,7 @@ async def get_routines(
     if nivel:
         query["nivel"] = nivel
     
-    routines = await db.routines.find(query).to_list(50)
+    routines = await db.routines.find(query, {"_id": 0}).to_list(50)
     return [Routine(**r) for r in routines]
 
 @api_router.get("/routines/{routine_id}", response_model=Routine)
@@ -428,10 +428,10 @@ async def get_workout_stats(current_user: dict = Depends(get_current_user)):
     # Get stats for last 30 days
     thirty_days_ago = datetime.utcnow() - timedelta(days=30)
     
-    workouts = await db.workout_sessions.find({
-        "user_id": current_user["id"],
-        "fecha": {"$gte": thirty_days_ago}
-    }).to_list(100)
+    workouts = await db.workout_sessions.find(
+        {"user_id": current_user["id"], "fecha": {"$gte": thirty_days_ago}},
+        {"calorias_quemadas": 1, "duracion_minutos": 1, "_id": 0}
+    ).to_list(100)
     
     total_calorias = sum(w.get("calorias_quemadas", 0) for w in workouts)
     total_minutos = sum(w.get("duracion_minutos", 0) for w in workouts)
@@ -448,7 +448,7 @@ async def get_workout_stats(current_user: dict = Depends(get_current_user)):
 
 @api_router.get("/achievements", response_model=List[Achievement])
 async def get_all_achievements():
-    achievements = await db.achievements.find().to_list(50)
+    achievements = await db.achievements.find({}, {"_id": 0}).to_list(50)
     return [Achievement(**a) for a in achievements]
 
 @api_router.get("/achievements/user", response_model=List[dict])
@@ -478,11 +478,11 @@ async def check_and_unlock_achievements(user_id: str):
         return
     
     # Get already unlocked achievements
-    unlocked = await db.user_achievements.find({"user_id": user_id}).to_list(100)
+    unlocked = await db.user_achievements.find({"user_id": user_id}, {"achievement_id": 1, "_id": 0}).to_list(100)
     unlocked_ids = {ua["achievement_id"] for ua in unlocked}
     
-    # Get all achievements
-    achievements = await db.achievements.find().to_list(50)
+    # Get all achievements with projection
+    achievements = await db.achievements.find({}, {"id": 1, "condicion": 1, "valor_requerido": 1, "_id": 0}).to_list(50)
     
     for achievement in achievements:
         if achievement["id"] in unlocked_ids:
@@ -586,8 +586,8 @@ Responde ÚNICAMENTE en español y en formato JSON:
 @api_router.get("/warmup/{workout_type}", response_model=List[Exercise])
 async def get_warmup_routine(workout_type: str):
     """Generate smart warmup based on workout type"""
-    # Get warmup exercises
-    warmup_exercises = await db.exercises.find({"categoria": "calentamiento"}).to_list(20)
+    # Get warmup exercises with projection
+    warmup_exercises = await db.exercises.find({"categoria": "calentamiento"}, {"_id": 0}).to_list(20)
     
     if not warmup_exercises:
         return []
