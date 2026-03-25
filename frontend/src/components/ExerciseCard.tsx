@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, Linking } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Exercise } from '../types';
@@ -25,6 +25,8 @@ const categoryIcons: Record<string, string> = {
 };
 
 export const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise, onPress, showYoutube = true }) => {
+  const [imageError, setImageError] = useState(false);
+
   const openYoutube = () => {
     if (exercise.youtube_url) {
       Linking.openURL(exercise.youtube_url);
@@ -34,11 +36,23 @@ export const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise, onPress, s
   return (
     <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.8}>
       <View style={styles.imageContainer}>
-        <Image
-          source={{ uri: exercise.gif_url }}
-          style={styles.gif}
-          resizeMode="cover"
-        />
+        {!imageError ? (
+          <Image
+            source={{ uri: exercise.gif_url }}
+            style={styles.gif}
+            resizeMode="cover"
+            onError={() => setImageError(true)}
+          />
+        ) : (
+          <View style={styles.placeholderContainer}>
+            <Ionicons 
+              name={categoryIcons[exercise.categoria] as any || 'fitness-outline'} 
+              size={60} 
+              color="#FF6B35" 
+            />
+            <Text style={styles.placeholderText}>Ver en YouTube</Text>
+          </View>
+        )}
         <View style={[styles.difficultyBadge, { backgroundColor: difficultyColors[exercise.dificultad] || '#666' }]}>
           <Text style={styles.difficultyText}>{exercise.dificultad.toUpperCase()}</Text>
         </View>
@@ -81,7 +95,7 @@ export const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise, onPress, s
         {showYoutube && exercise.youtube_url && (
           <TouchableOpacity style={styles.youtubeButton} onPress={openYoutube}>
             <Ionicons name="logo-youtube" size={18} color="#FF0000" />
-            <Text style={styles.youtubeText}>Ver tutorial</Text>
+            <Text style={styles.youtubeText}>Ver tutorial en YouTube</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -109,6 +123,17 @@ const styles = StyleSheet.create({
   gif: {
     width: '100%',
     height: '100%',
+  },
+  placeholderContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#1A1A1A',
+  },
+  placeholderText: {
+    color: '#666',
+    fontSize: 12,
+    marginTop: 8,
   },
   difficultyBadge: {
     position: 'absolute',

@@ -3,12 +3,14 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useAuthStore } from '../src/store/authStore';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
+import { CookieConsent } from '../src/components/CookieConsent';
 
 export default function RootLayout() {
-  const { loadToken, isLoading } = useAuthStore();
+  const { loadToken, checkCookies, isLoading } = useAuthStore();
 
   useEffect(() => {
     loadToken();
+    checkCookies();
   }, []);
 
   if (isLoading) {
@@ -21,7 +23,7 @@ export default function RootLayout() {
   }
 
   return (
-    <>
+    <View style={styles.container}>
       <StatusBar style="light" />
       <Stack
         screenOptions={{
@@ -36,11 +38,16 @@ export default function RootLayout() {
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="workout/[id]" options={{ presentation: 'modal' }} />
       </Stack>
-    </>
+      <CookieConsent />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#0A0A0A',
+  },
   loading: {
     flex: 1,
     justifyContent: 'center',
