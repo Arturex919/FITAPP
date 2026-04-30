@@ -1,0 +1,114 @@
+:root {
+  --primary-color: #FF6B35;
+  --primary-glow: rgba(255, 107, 53, 0.4);
+  --secondary-color: #2D3436;
+  --transition-smooth: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+/* Elite Themes - Specific requested colors */
+.dark-theme {
+  --bg-color: #1a1a1a; /* User specifically requested #1a1a1a */
+  --surface: #242424;
+  --surface-hover: #2d2d2d;
+  --nav-blur: rgba(26, 26, 26, 0.85);
+  --text-main: #FFFFFF;
+  --text-muted: #A0A0A0;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --glass: rgba(255, 255, 255, 0.05);
+  --input-bg: #2a2a2a;
+  --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.6);
+}
+
+.light-theme {
+  --bg-color: #FFFFFF;
+  --surface: #F8F9FA;
+  --surface-hover: #F1F3F5;
+  --nav-blur: rgba(255, 255, 255, 0.9);
+  --text-main: #000000;
+  --text-muted: #666666;
+  --border-subtle: rgba(0, 0, 0, 0.1);
+  --glass: rgba(0, 0, 0, 0.03);
+  --input-bg: #F1F3F5;
+  --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.08);
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  transition: background-color 0.5s ease, color 0.5s ease;
+  font-family: 'Outfit', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  margin: 0;
+}
+
+/* All text in app should respect theme color */
+* {
+  color: inherit;
+}
+
+.text-main { color: var(--text-main) !important; }
+.text-muted-custom { color: var(--text-muted) !important; }
+
+h1, h2, h3, h4, .navbar-brand {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 800;
+}
+
+/* Glassmorphism Elements */
+.glass-card {
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  backdrop-filter: blur(12px);
+  border-radius: 24px;
+  transition: var(--transition-smooth);
+}
+
+.navbar-custom {
+  background-color: var(--nav-blur) !important;
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 1rem 0;
+}
+
+.btn-primary-custom {
+  background: var(--primary-color) !important;
+  color: white !important;
+  border: none;
+  padding: 14px 32px;
+  border-radius: 16px;
+  font-weight: 700;
+  transition: var(--transition-smooth);
+  box-shadow: 0 8px 20px var(--primary-glow);
+}
+
+.exercise-card {
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 28px;
+  overflow: hidden;
+  transition: var(--transition-smooth);
+}
+
+.btn-filter {
+  background: var(--glass);
+  color: var(--text-main);
+  border: 1px solid var(--border-subtle);
+  padding: 12px 28px;
+  border-radius: 100px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  transition: var(--transition-smooth);
+}
+
+.btn-filter.active {
+  background: var(--primary-color);
+  color: white !important;
+  border-color: var(--primary-color);
+  box-shadow: 0 10px 25px var(--primary-glow);
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in { animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
